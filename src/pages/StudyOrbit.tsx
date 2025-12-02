@@ -47,17 +47,16 @@ export default function StudyOrbit() {
     lastStudyDay: null,
   });
 
-  const [tick, setTick] = useState(0);
+  const [tick, setTick] = useState(() => Date.now());
 
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    const id = setInterval(() => setTick(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
 
   const elapsed = useMemo(() => {
     if (!state.isRunning || !state.startedAt) return state.elapsedMs;
-    const now = Date.now();
-    return state.elapsedMs + (now - state.startedAt);
+    return state.elapsedMs + (tick - state.startedAt);
   }, [state.elapsedMs, state.isRunning, state.startedAt, tick]);
 
   useEffect(() => {

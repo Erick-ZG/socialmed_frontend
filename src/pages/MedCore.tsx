@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Bookmark,
@@ -76,27 +76,27 @@ type UserProfile = {
 const DOI_DB: Record<string, DoiPreview> = {
   "10.1234/medverse.2025.001": {
     doi: "10.1234/medverse.2025.001",
-    title: "Hipotensión perioperatoria: umbrales pragmáticos y desenlaces (mock)",
+    title: "Hipotensin perioperatoria: umbrales pragmticos y desenlaces (mock)",
     venue: "Revista Medverse (mock)",
     year: "2025",
     abstract:
-      "Antecedentes: La hipotensión durante la cirugía es común. Métodos: analizamos trayectorias perioperatorias de PAM y desenlaces. Resultados: una PAM baja sostenida se asoció con más eventos adversos. Conclusión: el riesgo depende del tiempo y la profundidad.",
+      "Antecedentes: La hipotensin durante la ciruga es comn. Mtodos: analizamos trayectorias perioperatorias de PAM y desenlaces. Resultados: una PAM baja sostenida se asoci con ms eventos adversos. Conclusin: el riesgo depende del tiempo y la profundidad.",
     keyPoints: [
-      "La profundidad + duración importan más que un solo umbral",
-      "Los subgrupos de alto riesgo muestran asociaciones más fuertes",
-      "Las metas deben individualizarse, no ser “talla única”",
+      "La profundidad + duracin importan ms que un solo umbral",
+      "Los subgrupos de alto riesgo muestran asociaciones ms fuertes",
+      "Las metas deben individualizarse, no ser talla nica",
     ],
-    tags: ["anestesia", "hemodinámica", "perioperatorio"],
+    tags: ["anestesia", "hemodinmica", "perioperatorio"],
   },
   "10.5678/medverse.2024.042": {
     doi: "10.5678/medverse.2024.042",
-    title: "Ruta para jóvenes investigadores en síntesis de evidencia (mock)",
+    title: "Ruta para jvenes investigadores en sntesis de evidencia (mock)",
     venue: "Open Methods (mock)",
     year: "2024",
     abstract:
-      "Esta guía propone un flujo de trabajo liviano para búsqueda sistemática, cribado y síntesis, pensado para estudiantes y clínicos en etapas tempranas.",
+      "Esta gua propone un flujo de trabajo liviano para bsqueda sistemtica, cribado y sntesis, pensado para estudiantes y clnicos en etapas tempranas.",
     keyPoints: ["Define PICO desde el inicio", "Cribado reproducible", "Resume con grado de certeza"],
-    tags: ["investigación", "revisión-sistemática", "métodos"],
+    tags: ["investigacin", "revisin-sistemtica", "mtodos"],
   },
 };
 
@@ -115,42 +115,38 @@ function slug(s: string) {
 }
 
 const INTEREST_MAP: Record<string, string[]> = {
-  "evidencia clínica": ["evidence", "clinical", "outcome", "association", "risk", "effect", "trial", "meta"],
-  "ensayos clínicos": ["trial", "random", "rct"],
-  "meta-análisis": ["meta", "systematic", "forest", "review"],
-  "guías": ["guideline", "recommend", "consensus"],
-  "farmacología": ["drug", "dose", "pharm", "adverse"],
+  "evidencia clnica": ["evidence", "clinical", "outcome", "association", "risk", "effect", "trial", "meta"],
+  "ensayos clnicos": ["trial", "random", "rct"],
+  "meta-anlisis": ["meta", "systematic", "forest", "review"],
+  "guas": ["guideline", "recommend", "consensus"],
+  "farmacologa": ["drug", "dose", "pharm", "adverse"],
   "dolor": ["pain", "analges", "opioid"],
   "infecciosas": ["infection", "sepsis", "antibiotic"],
-  "cuidados críticos": ["icu", "critical", "ventilation", "shock"],
-  "epidemiología": ["cohort", "incidence", "prevalence"],
-  "diagnóstico": ["diagnostic", "sensitivity", "specificity", "screening"],
+  "cuidados crticos": ["icu", "critical", "ventilation", "shock"],
+  "epidemiologa": ["cohort", "incidence", "prevalence"],
+  "diagnstico": ["diagnostic", "sensitivity", "specificity", "screening"],
   "ia en salud": ["ai", "machine", "model", "neural", "algorithm"],
-  "educación médica": ["education", "learning", "curriculum", "journal club"],
-  "investigación joven": ["student", "early-career", "young", "roadmap"],
+  "educacin mdica": ["education", "learning", "curriculum", "journal club"],
+  "investigacin joven": ["student", "early-career", "young", "roadmap"],
   "sistemas de salud": ["health system", "policy", "quality", "implementation"],
 };
 
 const SPECIALTY_MAP: Record<string, string[]> = {
   "medicina interna": ["internal", "complex", "diagnostic", "cohort", "clinical"],
-  "anestesiología": ["anesthesia", "perioperative", "pain", "hemodynamics", "map"],
-  "cardiología": ["cardio", "heart", "bp", "risk"],
-  "pediatría": ["pediatric", "children", "neonatal"],
-  "salud pública": ["public", "population", "policy", "incidence"],
-  "radiología": ["imaging", "radiology", "scan", "ct", "mri"],
+  "anestesiologa": ["anesthesia", "perioperative", "pain", "hemodynamics", "map"],
+  "cardiologa": ["cardio", "heart", "bp", "risk"],
+  "pediatra": ["pediatric", "children", "neonatal"],
+  "salud pblica": ["public", "population", "policy", "incidence"],
+  "radiologa": ["imaging", "radiology", "scan", "ct", "mri"],
   "emergencias": ["emergency", "triage", "acute"],
-  "neurología": ["neuro", "stroke", "seizure"],
-  "ginecología": ["pregnancy", "obstetric", "gyne"],
-  "cirugía": ["surgery", "operative", "perioperative"],
+  "neurologa": ["neuro", "stroke", "seizure"],
+  "ginecologa": ["pregnancy", "obstetric", "gyne"],
+  "ciruga": ["surgery", "operative", "perioperative"],
 };
 
 function normTextForMatch(p: Post) {
   const parts = [p.text, p.doi?.doi, p.doi?.title, p.doi?.venue, p.doi?.abstract, ...(p.doi?.tags ?? [])].filter(Boolean);
   return parts.join(" ").toLowerCase();
-}
-
-function pickTop<T>(arr: T[], n: number) {
-  return arr.slice(0, Math.max(0, n));
 }
 
 function mulberry32(seed: number) {
@@ -178,43 +174,43 @@ function generateAiPack(doi: DoiPreview): AiPack {
   const pick = (xs: string[]) => xs[Math.floor(rnd() * xs.length)];
 
   const bg = [
-    "Pregunta clínica: por qué importa para decisiones del día a día.",
-    "Contexto: escenario común con trade-offs de riesgo no triviales.",
-    "Justificación: umbrales pequeños pueden tener grandes consecuencias.",
+    "Pregunta clnica: por qu importa para decisiones del da a da.",
+    "Contexto: escenario comn con trade-offs de riesgo no triviales.",
+    "Justificacin: umbrales pequeos pueden tener grandes consecuencias.",
   ];
   const meth = [
-    "Métodos: diseño + cohorte + cómo se midieron exposición y desenlaces.",
-    "Métodos: análisis pragmático centrado en endpoints clínicamente relevantes.",
-    "Métodos: flujo estructurado con pasos reproducibles para investigadores jóvenes.",
+    "Mtodos: diseo + cohorte + cmo se midieron exposicin y desenlaces.",
+    "Mtodos: anlisis pragmtico centrado en endpoints clnicamente relevantes.",
+    "Mtodos: flujo estructurado con pasos reproducibles para investigadores jvenes.",
   ];
   const res = [
-    "Resultados: señales del efecto con incertidumbre; heterogeneidad probable.",
-    "Resultados: la señal más fuerte aparece en subgrupos de mayor riesgo.",
-    "Resultados: asociación consistente cuando la exposición es sostenida (tiempo + profundidad).",
+    "Resultados: seales del efecto con incertidumbre; heterogeneidad probable.",
+    "Resultados: la seal ms fuerte aparece en subgrupos de mayor riesgo.",
+    "Resultados: asociacin consistente cuando la exposicin es sostenida (tiempo + profundidad).",
   ];
   const tk = [
-    "Conclusión práctica: aplica con metas conservadoras y específicas por paciente.",
-    "Conclusión práctica: flujo simple: define PICO → criba → resume la certeza.",
-    "Conclusión práctica: trata la exposición como dosis (intensidad × tiempo), no como binario.",
+    "Conclusin prctica: aplica con metas conservadoras y especficas por paciente.",
+    "Conclusin prctica: flujo simple: define PICO  criba  resume la certeza.",
+    "Conclusin prctica: trata la exposicin como dosis (intensidad  tiempo), no como binario.",
   ];
 
   const k1 = [
-    "La dirección del desenlace primario coincide con la hipótesis (mock).",
-    "Útil para journal club y resúmenes rápidos de evidencia (mock).",
-    "La señal por subgrupos sugiere dónde enfocar el monitoreo (mock).",
+    "La direccin del desenlace primario coincide con la hiptesis (mock).",
+    "til para journal club y resmenes rpidos de evidencia (mock).",
+    "La seal por subgrupos sugiere dnde enfocar el monitoreo (mock).",
   ];
   const k2 = [
-    "Limitación: sesgo observacional / confusión no controlada (mock).",
-    "Limitación: la generalización depende del entorno y los umbrales (mock).",
-    "Limitación: el flujo aún requiere revisión de dominio para evitar simplificar de más (mock).",
+    "Limitacin: sesgo observacional / confusin no controlada (mock).",
+    "Limitacin: la generalizacin depende del entorno y los umbrales (mock).",
+    "Limitacin: el flujo an requiere revisin de dominio para evitar simplificar de ms (mock).",
   ];
   const k3 = [
-    "Nota clínica: ajusta según riesgo basal y contexto del paciente.",
-    "Práctico: 1 frase de resumen + 1 limitación mejora la calidad al compartir.",
-    "Siguiente paso: se necesita validación prospectiva / replicación.",
+    "Nota clnica: ajusta segn riesgo basal y contexto del paciente.",
+    "Prctico: 1 frase de resumen + 1 limitacin mejora la calidad al compartir.",
+    "Siguiente paso: se necesita validacin prospectiva / replicacin.",
   ];
 
-  const figLabels = ["Efecto", "Certeza", "Aplicabilidad", "Señal", "Complejidad"];
+  const figLabels = ["Efecto", "Certeza", "Aplicabilidad", "Seal", "Complejidad"];
   const figVals = ["Bajo", "Moderado", "Alto", "Mixto", "Fuerte", "Incierto"];
 
   const miniFigure = Array.from({ length: 3 }).map(() => ({
@@ -370,8 +366,8 @@ export default function MedCore() {
   }, [doiInput]);
 
   const youHandle = user?.handle || "you";
-  const youName = user?.name || "Tú (Prototipo)";
-  const youHeadline = user ? `${user.roleLine} • ${user.school}` : "Estudiante • Investigador/a joven";
+  const youName = user?.name || "T (Prototipo)";
+  const youHeadline = user ? `${user.roleLine}  ${user.school}` : "Estudiante  Investigador/a joven";
   const youInitials = useMemo(() => {
     const n = youName.split(" ").filter(Boolean);
     return n
@@ -483,7 +479,7 @@ export default function MedCore() {
       author: { handle: youHandle, name: youName, initials: youInitials, headline: youHeadline },
       createdAt: nowLabel(),
       doi: doiPreview ?? undefined,
-      text: body || "Compartí un DOI (sin comentarios adicionales).",
+      text: body || "Compart un DOI (sin comentarios adicionales).",
       hasVideoNote: videoNote,
       metrics: { reads: 0 },
       spark: { count: 0, active: false, likedBy: [] },
@@ -559,7 +555,7 @@ export default function MedCore() {
                 onClick={() => setComposerOpen(true)}
               >
                 <Avatar initials={youInitials} size={40} />
-                <span className="flex-1 text-sm text-white/60">¿Piensas en compartir algo?</span>
+                <span className="flex-1 text-sm text-white/60">Piensas en compartir algo?</span>
                 <span className="text-xs text-white/50">Abrir</span>
               </button>
             ) : (
@@ -568,7 +564,7 @@ export default function MedCore() {
                   <div>
                     <div className="text-lg font-extrabold">Comparte con la red</div>
                     <div className="mt-1 text-xs text-white/60">
-                      Señales: especialidad, intereses, Interesante, actividad de mates.
+                      Seales: especialidad, intereses, Interesante, actividad de mates.
                     </div>
                   </div>
 
@@ -598,7 +594,7 @@ export default function MedCore() {
                   <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Caso</span>
                   <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Hallazgo</span>
                   <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Teaching pearl</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Revisión rápida</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Revisin rpida</span>
                 </div>
 
                 <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -632,7 +628,7 @@ export default function MedCore() {
 
                 {doiInput.trim() && !doiPreview && (
                   <div className="mt-3 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-4 py-3 text-white/70">
-                    DOI no encontrado en la BD mock. (En producción: Crossref/PubMed/Unpaywall)
+                    DOI no encontrado en la BD mock. (En produccin: Crossref/PubMed/Unpaywall)
                   </div>
                 )}
 
@@ -671,7 +667,7 @@ export default function MedCore() {
                               : "border-violet-300/25 bg-violet-300/10 hover:brightness-105"
                           )}
                           disabled={aiBusy === doiPreview.doi}
-                          title="Botón mock: en app real, esto llamaría a un servicio de IA"
+                          title="Botn mock: en app real, esto llamara a un servicio de IA"
                         >
                           <Wand2 size={14} /> {aiByDoi[doiPreview.doi] ? "Regenerar IA" : "Generar con IA"}
                         </button>
@@ -686,10 +682,10 @@ export default function MedCore() {
 
                       <div className="rounded-2xl border border-white/10 bg-[radial-gradient(600px_260px_at_70%_0%,rgba(140,107,255,.18),transparent_60%)] from-white/5 to-white/[0.02] p-4">
                         <div className="flex items-center justify-between gap-3">
-                          <div className="text-sm font-bold text-white/90">Infografía del abstract</div>
+                          <div className="text-sm font-bold text-white/90">Infografa del abstract</div>
                           {aiByDoi[doiPreview.doi] && (
                             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/70">
-                              IA · {aiByDoi[doiPreview.doi].generatedAt}
+                              IA  {aiByDoi[doiPreview.doi].generatedAt}
                             </span>
                           )}
                         </div>
@@ -698,7 +694,7 @@ export default function MedCore() {
                           <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-3 text-xs text-white/70">
                             <div className="flex items-center gap-2">
                               <span className="h-2 w-2 animate-ping rounded-full bg-cyan-300" />
-                              <span>IA generando un resumen del DOI…</span>
+                              <span>IA generando un resumen del DOI</span>
                             </div>
                             <div className="mt-2 h-2 animate-pulse rounded bg-white/10" />
                           </div>
@@ -732,7 +728,7 @@ export default function MedCore() {
                   className="mt-4 min-h-[110px] w-full resize-y rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none placeholder:text-white/40"
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  placeholder="Escribe qué hace interesante el DOI para clínica o docencia…"
+                  placeholder="Escribe qu hace interesante el DOI para clnica o docencia"
                 />
 
                 {videoNote && (
@@ -741,14 +737,14 @@ export default function MedCore() {
                       Nota en video (mock)
                     </div>
                     <div className="mt-2 text-sm text-white/70">
-                      Agrega un clip de 30–90s explicando por qué importa clínicamente.
+                      Agrega un clip de 3090s explicando por qu importa clnicamente.
                     </div>
                   </div>
                 )}
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                   <div className="text-xs text-white/60">
-                    Tip: DOI + 1 limitación + 1 conclusión práctica. Se publica directo en tu feed.
+                    Tip: DOI + 1 limitacin + 1 conclusin prctica. Se publica directo en tu feed.
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -792,12 +788,12 @@ export default function MedCore() {
           </div>
         </div>
 
-        {/* Panel lateral para hacerlo más “network” */}
+        {/* Panel lateral para hacerlo ms network */}
         <div className="space-y-4 max-[1080px]:hidden">
           <GlassCard className="p-5 shadow-none">
             <div className="flex items-center justify-between">
               <div className="inline-flex items-center gap-2 text-sm font-extrabold">
-                <TrendingUp size={16} /> Tendencias rápidas
+                <TrendingUp size={16} /> Tendencias rpidas
               </div>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/60">
                 Top {Math.min(5, trending.length)}
@@ -805,7 +801,7 @@ export default function MedCore() {
             </div>
             <div className="mt-3 space-y-3">
               {trending.length === 0 ? (
-                <div className="text-sm text-white/60">Sin tendencia aún. Interactúa con los mocks.</div>
+                <div className="text-sm text-white/60">Sin tendencia an. Interacta con los mocks.</div>
               ) : (
                 trending.slice(0, 5).map((p) => (
                   <div key={p.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
@@ -843,7 +839,7 @@ export default function MedCore() {
                 </Link>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-xs text-white/60">
-                Interesante = interés clínico/docente, Orbit = guardado para leer.
+                Interesante = inters clnico/docente, Orbit = guardado para leer.
               </div>
             </div>
           </GlassCard>
@@ -863,7 +859,7 @@ function trendingReasons(p: Post): string[] {
   if (p.metrics.reads >= 80) reasons.push("Muchas lecturas");
   if (p.recast.count >= 15) reasons.push("Muy recasteado");
   if (p.spark.count >= 120) reasons.push("Muchos intereses");
-  if (reasons.length === 0) reasons.push("Señal de tendencia");
+  if (reasons.length === 0) reasons.push("Seal de tendencia");
   return reasons.slice(0, 2);
 }
 
@@ -970,7 +966,7 @@ function PostCard({
           <Avatar initials={post.author.initials} size={44} />
           <div className="min-w-0">
             <div className="truncate font-extrabold">
-              {post.author.name} <span className="font-normal text-white/55">· {post.createdAt}</span>
+              {post.author.name} <span className="font-normal text-white/55"> {post.createdAt}</span>
             </div>
             <div className="mt-1 text-xs text-white/65">{post.author.headline}</div>
 
@@ -1058,7 +1054,7 @@ function PostCard({
             <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-xs text-white/70">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 animate-ping rounded-full bg-cyan-300" />
-                <span>IA generando un resumen de esta publicación…</span>
+                <span>IA generando un resumen de esta publicacin</span>
               </div>
               <div className="mt-2 h-2 animate-pulse rounded bg-white/10" />
             </div>
@@ -1126,7 +1122,7 @@ function PostCard({
             <input
               value={c}
               onChange={(e) => setC(e.target.value)}
-              placeholder="Agrega un comentario (sé específico)…"
+              placeholder="Agrega un comentario (s especfico)"
               className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none placeholder:text-white/40"
             />
             <button
@@ -1142,7 +1138,7 @@ function PostCard({
 
           <div className="mt-3 space-y-3">
             {post.rounds.items.length === 0 ? (
-              <div className="text-sm text-white/60">Aún no hay comentarios.</div>
+              <div className="text-sm text-white/60">An no hay comentarios.</div>
             ) : (
               post.rounds.items.map((x, i) => (
                 <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -1166,9 +1162,9 @@ function AiInfographic({ pack, compact }: { pack: AiPack; compact?: boolean }) {
     <div className="mt-3">
       <div className={clsx("grid gap-3", grid)}>
         <MiniTile title="Contexto" text={pack.background} pad={pad} />
-        <MiniTile title="Métodos" text={pack.methods} pad={pad} />
+        <MiniTile title="Mtodos" text={pack.methods} pad={pad} />
         <MiniTile title="Resultados" text={pack.results} pad={pad} />
-        <MiniTile title="Conclusión práctica" text={pack.takeaway} pad={pad} />
+        <MiniTile title="Conclusin prctica" text={pack.takeaway} pad={pad} />
       </div>
 
       <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -1199,3 +1195,4 @@ function MiniTile({ title, text, pad }: { title: string; text: string; pad: stri
     </div>
   );
 }
+

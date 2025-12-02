@@ -13,7 +13,10 @@ function readJSON<T>(key: string, fallback: T): T {
 
 export default function useLocalStorageState<T>(key: string, initialValue: T) {
   const initialRef = useRef(initialValue);
-  initialRef.current = initialValue;
+
+  useEffect(() => {
+    initialRef.current = initialValue;
+  }, [initialValue]);
 
   const [value, setValue] = useState<T>(() => readJSON<T>(key, initialValue));
 

@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronDown, LogOut, User as UserIcon, Settings } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Menu, X, ChevronDown, LogOut, User as UserIcon, Settings, SunMoon } from "lucide-react";
 
 import Avatar from "./Avatar";
 import useLocalStorageState from "../utils/useLocalStorageState";
 
 type NavItem = { to?: string; label: string; disabled?: boolean };
 type Session = { handle: string; loggedInAt: string };
+type Theme = "light" | "dark";
 
 type UserProfile = {
   handle: string;
@@ -29,13 +30,16 @@ const items: NavItem[] = [
 function initials(name?: string) {
   if (!name) return "MV";
   const parts = name.split(" ").filter(Boolean);
-  return parts.slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  return parts
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
 }
 
-export default function NavBar() {
+export default function NavBar({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
   const [open, setOpen] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
-  const loc = useLocation();
   const nav = useNavigate();
 
   const [session, setSession] = useLocalStorageState<Session | null>("mv_session", null);
@@ -54,27 +58,27 @@ export default function NavBar() {
     nav("/", { replace: true });
   }
 
-function logout() {
-  // hard clear (por si algún guard lee directo localStorage)
-  localStorage.removeItem("mv_session");
-  localStorage.removeItem("mv_user");
+  function logout() {
+    // clear local state + storage
+    localStorage.removeItem("mv_session");
+    localStorage.removeItem("mv_user");
 
-  setSession(null);
-  setUser(null);
+    setSession(null);
+    setUser(null);
 
-  setUserMenu(false);
-  setOpen(false);
+    setUserMenu(false);
+    setOpen(false);
 
-  nav("/", { replace: true });
-}
+    nav("/", { replace: true });
+  }
 
   return (
-    <header className="relative mx-auto w-[min(1140px,92vw)] pt-5">
+    <header className="relative mx-auto w-[min(1260px,94vw)] pt-5">
       <nav className="flex items-center justify-between">
         {/* Logo */}
         <NavLink to={isLogged ? "/medcore" : "/"} className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/5">
-            <span className="text-sm font-black">✦</span>
+            <span className="text-sm font-black">MV</span>
           </div>
           <span className="text-lg font-extrabold tracking-[0.12em]">MEDVERSE</span>
         </NavLink>
@@ -102,8 +106,19 @@ function logout() {
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="hidden sm:inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white/80 hover:bg-white/10"
+            aria-label="Cambiar tema"
+            title={theme === "light" ? "Usar tema oscuro" : "Usar tema claro"}
+          >
+            <SunMoon size={18} />
+          </button>
+
           {!isLogged ? (
             <button
+              type="button"
               onClick={goLogin}
               className="hidden sm:inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
             >
@@ -114,6 +129,7 @@ function logout() {
               {userMenu && <div className="fixed inset-0 z-10" onClick={() => setUserMenu(false)} aria-hidden="true" />}
 
               <button
+                type="button"
                 onClick={() => setUserMenu((v) => !v)}
                 className="relative z-20 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10"
                 aria-haspopup="menu"
@@ -154,8 +170,15 @@ function logout() {
                     </NavLink>
                     <button
                       type="button"
-                      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); logout(); }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        logout();
+                      }}
                       className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/80 hover:bg-white/10"
                     >
                       <LogOut size={16} /> Log out
@@ -167,6 +190,7 @@ function logout() {
           )}
 
           <button
+            type="button"
             onClick={() => setOpen((v) => !v)}
             className="inline-flex md:hidden items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 hover:bg-white/10"
             aria-label="Menu"
@@ -180,6 +204,16 @@ function logout() {
       {open && (
         <div className="md:hidden mt-3 rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl p-3">
           <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                onToggleTheme();
+                setOpen(false);
+              }}
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-white/80 hover:bg-white/10"
+            >
+              <SunMoon size={16} /> Tema: {theme === "light" ? "claro" : "oscuro"}
+            </button>
             {items.map((it) =>
               it.disabled || !it.to ? (
                 <div key={it.label} className="rounded-xl px-3 py-2 text-white/45">
@@ -191,9 +225,10 @@ function logout() {
                   to={it.to}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
-                    ["rounded-xl px-3 py-2", isActive ? "bg-white/10 text-white" : "text-white/80 hover:bg-white/10"].join(
-                      " "
-                    )
+                    [
+                      "rounded-xl px-3 py-2",
+                      isActive ? "bg-white/10 text-white" : "text-white/80 hover:bg-white/10",
+                    ].join(" ")
                   }
                 >
                   {it.label}
@@ -203,7 +238,11 @@ function logout() {
 
             <div className="mt-2 border-t border-white/10 pt-2">
               {!isLogged ? (
-                <button onClick={goLogin} className="w-full rounded-xl px-3 py-2 text-left text-white/85 hover:bg-white/10">
+                <button
+                  type="button"
+                  onClick={goLogin}
+                  className="w-full rounded-xl px-3 py-2 text-left text-white/85 hover:bg-white/10"
+                >
                   Log in
                 </button>
               ) : (
@@ -224,8 +263,15 @@ function logout() {
                   </NavLink>
                   <button
                     type="button"
-                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); logout(); }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      logout();
+                    }}
                     className="w-full rounded-xl px-3 py-2 text-left text-white/85 hover:bg-white/10"
                   >
                     Log out

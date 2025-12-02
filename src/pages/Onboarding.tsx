@@ -51,7 +51,7 @@ const INTERESTS = [
 
 export default function Onboarding() {
   const nav = useNavigate();
-  const loc = useLocation() as any;
+  const loc = useLocation();
 
   const [, setUser] = useLocalStorageState<UserProfile | null>("mv_user", null);
 
