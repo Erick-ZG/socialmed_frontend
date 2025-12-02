@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Bookmark,
   Link2,
@@ -6,6 +7,7 @@ import {
   Repeat2,
   Send,
   Sparkles,
+  Orbit,
   TrendingUp,
   Video,
   Wand2,
@@ -13,6 +15,11 @@ import {
   Copy,
   Users,
   Flame,
+  Home,
+  Compass,
+  Search,
+  PlusCircle,
+  Bell,
 } from "lucide-react";
 import GlassCard from "../components/GlassCard";
 import Avatar from "../components/Avatar";
@@ -234,6 +241,7 @@ export default function MedCore() {
   const [videoNote, setVideoNote] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [aiBusy, setAiBusy] = useState<string | null>(null);
+  const [composerOpen, setComposerOpen] = useState(false);
 
   const [user] = useLocalStorageState<UserProfile | null>("mv_user", null);
   const [following] = useLocalStorageState<string[]>("mv_following", []);
@@ -246,12 +254,12 @@ export default function MedCore() {
         handle: "sara.m",
         name: "Dra. Sara Morrison",
         initials: "SM",
-        headline: "Anestesiología • Cuidado perioperatorio",
+        headline: "Anestesiologia | Cuidado perioperatorio",
       },
       createdAt: nowLabel(),
       doi: DOI_DB["10.1234/medverse.2025.001"],
       text:
-        "Hot take: la hipotensión no es binaria. Me gusta tratarla como exposición tiempo+profundidad. Sería genial ver subgrupos por metas basales.",
+        "Hot take: la hipotension no es binaria. La trato como exposicion tiempo+profundidad. En guardia veo subgrupos con metas basales distintas.",
       hasVideoNote: true,
       metrics: { reads: 124 },
       spark: { count: 218, active: false, likedBy: ["intern-vale", "carlos.r"] },
@@ -260,7 +268,7 @@ export default function MedCore() {
       rounds: {
         count: 2,
         items: [
-          { by: "med-student-ana", text: "De acuerdo. ¿Y la dosis-respuesta de vasopresores?" },
+          { by: "med-student-ana", text: "De acuerdo. Y la dosis-respuesta de vasopresores?" },
           { by: "resident-yoel", text: "Buenazo para journal club." },
         ],
       },
@@ -271,18 +279,87 @@ export default function MedCore() {
         handle: "john.h",
         name: "Dr. John R. Hernandez",
         initials: "JH",
-        headline: "Medicina Interna • Investigación aplicada",
+        headline: "Medicina Interna | Investigacion aplicada",
       },
       createdAt: nowLabel(),
       doi: DOI_DB["10.5678/medverse.2024.042"],
       text:
-        "Para estudiantes: workflow (mock) claro y práctico. Ideal para empezar con evidencia sin perderse en herramientas complejas.",
+        "Ruta para jovenes investigadores: checklist liviano para busqueda y cribado. Me funciono con 2 RCTs de sepsis sin volverme loco.",
       hasVideoNote: false,
       metrics: { reads: 56 },
       spark: { count: 94, active: false, likedBy: ["carlos.r"] },
       orbit: { active: true },
       recast: { count: 12 },
-      rounds: { count: 1, items: [{ by: "intern-vale", text: "¿Sirve para revisión rápida en guardia?" }] },
+      rounds: { count: 1, items: [{ by: "intern-vale", text: "Sirve para revision rapida en guardia?" }] },
+    },
+    {
+      id: "p3",
+      author: {
+        handle: "vale.intern",
+        name: "Valeria Soto",
+        initials: "VS",
+        headline: "Interna | Rotacion UCI",
+      },
+      createdAt: nowLabel(),
+      text:
+        "Caso: paciente post-cirugia con PAM bailarina. Uso metas de PAM adaptadas al basal y me funciono mejor que 65 fijo.",
+      metrics: { reads: 78 },
+      spark: { count: 61, active: false, likedBy: ["sara.m", "carlos.r"] },
+      orbit: { active: false },
+      recast: { count: 9 },
+      rounds: { count: 3, items: [{ by: "sara.m", text: "Clave: medir tiempo bajo umbral." }] },
+    },
+    {
+      id: "p4",
+      author: {
+        handle: "carlos.r",
+        name: "Dr. Carlos Ruiz",
+        initials: "CR",
+        headline: "Emergencias | Docente",
+      },
+      createdAt: nowLabel(),
+      text:
+        "Teaching pearl: al presentar un paper, di 1 aplicacion clinica y 1 limitacion. El equipo lo recuerda mejor.",
+      hasVideoNote: false,
+      metrics: { reads: 42 },
+      spark: { count: 33, active: false, likedBy: ["john.h"] },
+      orbit: { active: true },
+      recast: { count: 6 },
+      rounds: { count: 0, items: [] },
+    },
+    {
+      id: "p5",
+      author: {
+        handle: "andrea.cardio",
+        name: "Dra. Andrea Vega",
+        initials: "AV",
+        headline: "Cardiologia | Imagen avanzada",
+      },
+      createdAt: nowLabel(),
+      text:
+        "Hallazgo: eco de stress en paciente joven con dolor atipico. Calcium score bajo cambia probabilidad pre-test antes de troponinas.",
+      metrics: { reads: 91 },
+      spark: { count: 102, active: false, likedBy: ["vale.intern", "john.h"] },
+      orbit: { active: false },
+      recast: { count: 14 },
+      rounds: { count: 2, items: [{ by: "john.h", text: "Prob pre-test antes de pedir troponinas: clave." }] },
+    },
+    {
+      id: "p6",
+      author: {
+        handle: "sofia.id",
+        name: "Sofia Diaz",
+        initials: "SD",
+        headline: "Infecciosas | Fellow",
+      },
+      createdAt: nowLabel(),
+      text:
+        "Nota rapida: en IA de imagenes pidan sensibilidad/especificidad y calibracion. AUROC no dice riesgo absoluto.",
+      metrics: { reads: 64 },
+      spark: { count: 44, active: false, likedBy: ["andrea.cardio"] },
+      orbit: { active: false },
+      recast: { count: 8 },
+      rounds: { count: 1, items: [{ by: "carlos.r", text: "Ojo con prevalencia local, sobreajuste." }] },
     },
   ]);
 
@@ -305,8 +382,18 @@ export default function MedCore() {
   }, [youName]);
 
   const trending = useMemo(() => {
-    // Trending por lecturas + recast + sparks (top 10)
+    // Trending por lecturas + recast + intereses (top 10)
     return [...posts].sort((a, b) => scoreTrending(b) - scoreTrending(a)).slice(0, 10);
+  }, [posts]);
+
+  const stories = useMemo(() => {
+    return posts.slice(0, 10).map((p) => ({
+      id: p.id,
+      handle: p.author.handle,
+      name: p.author.name,
+      initials: p.author.initials,
+      headline: p.author.headline,
+    }));
   }, [posts]);
 
   const forYou = useMemo(() => {
@@ -417,215 +504,349 @@ export default function MedCore() {
 
   return (
     <div className="pt-2">
-      <div className="mb-4">
-        <h2 className="text-[28px] font-extrabold tracking-[-0.02em]">MedCore</h2>
-        <p className="mt-1 text-white/70">
-          DOI → abstract + mini-infografía (IA mock) + Spark/Orbit/Rounds/Recast + algoritmo Para ti (mock).
-        </p>
-      </div>
 
-      <div className="grid grid-cols-[1.05fr_1fr] gap-4 max-[980px]:grid-cols-1">
-        {/* Composer */}
-        <GlassCard className="p-5 shadow-none">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-lg font-extrabold">Compartir evidencia</div>
-              <div className="mt-1 text-xs text-white/60">
-                Señales usadas: <span className="text-white/75">especialidad</span>,{" "}
-                <span className="text-white/75">intereses</span>,{" "}
-                <span className="text-white/75">sparks</span>,{" "}
-                <span className="text-white/75">actividad de tus mates</span>.
+      <div className="grid grid-cols-[210px_minmax(0,1fr)_320px] gap-4 max-[1280px]:grid-cols-[190px_minmax(0,1fr)] max-[1080px]:grid-cols-1">
+        {/* Nav lateral estilo Instagram */}
+        <div className="space-y-3 rounded-3xl border border-white/10 bg-white/[0.03] p-4 max-[1080px]:hidden">
+          <div className="inline-flex items-center gap-2 text-sm font-bold text-white/85">
+            <Sparkles size={16} /> MedCore
+          </div>
+          <div className="space-y-2 text-sm text-white/75">
+            {[
+              { icon: Home, label: "Inicio" },
+              { icon: Search, label: "Buscar" },
+              { icon: Compass, label: "Explorar" },
+              { icon: Video, label: "Reels" },
+              { icon: Users, label: "Mates" },
+              { icon: Bookmark, label: "Orbit" },
+              { icon: Bell, label: "Alertas" },
+              { icon: PlusCircle, label: "Crear" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2 hover:bg-white/5"
+                title={item.label}
+              >
+                <item.icon size={18} />
+                <span>{item.label}</span>
               </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                className={clsx(
-                  "inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5",
-                  mode === "forYou" ? "bg-white/10" : "bg-white/5 hover:bg-white/10"
-                )}
-                onClick={() => setMode("forYou")}
-              >
-                <Users size={16} /> Para ti
-              </button>
-              <button
-                className={clsx(
-                  "inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5",
-                  mode === "trending" ? "bg-white/10" : "bg-white/5 hover:bg-white/10"
-                )}
-                onClick={() => setMode("trending")}
-              >
-                <TrendingUp size={16} /> Tendencias
-              </button>
-            </div>
+            ))}
           </div>
+        </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <Link2 size={16} className="opacity-80" />
-              <input
-                value={doiInput}
-                onChange={(e) => setDoiInput(e.target.value)}
-                placeholder="Pega un DOI (p.ej., 10.1234/medverse.2025.001)"
-                className="w-full bg-transparent outline-none placeholder:text-white/40"
-              />
+        <div className="space-y-4">
+          {/* Stories estilo Instagram (ahora a la izquierda del contenido) */}
+          <GlassCard className="p-4 shadow-none">
+            <div className="flex items-center gap-3 overflow-x-auto pb-1">
+              {stories.map((s) => (
+                <div key={s.id} className="flex w-[68px] flex-col items-center gap-2">
+                  <div className="rounded-full bg-gradient-to-tr from-pink-500 via-orange-400 to-yellow-300 p-[2px]">
+                    <div className="flex h-[60px] w-[60px] items-center justify-center rounded-full bg-black/70">
+                      <Avatar initials={s.initials} size={56} />
+                    </div>
+                  </div>
+                  <div className="w-full truncate text-center text-[11px] text-white/70">@{s.handle}</div>
+                </div>
+              ))}
             </div>
+          </GlassCard>
 
-            <button
-              className={clsx(
-                "inline-flex items-center gap-2 rounded-2xl border border-white/10 px-4 py-3",
-                videoNote ? "bg-blue-500/20 border-blue-400/30" : "bg-white/5 hover:bg-white/10"
-              )}
-              onClick={() => setVideoNote((v) => !v)}
-            >
-              <Video size={16} /> Nota en video
-            </button>
+          {/* Composer estilo Facebook, colapsado hasta hacer foco */}
+          <GlassCard className="p-4 shadow-none">
+            {!composerOpen ? (
+              <button
+                className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left hover:bg-white/10"
+                onClick={() => setComposerOpen(true)}
+              >
+                <Avatar initials={youInitials} size={40} />
+                <span className="flex-1 text-sm text-white/60">¿Piensas en compartir algo?</span>
+                <span className="text-xs text-white/50">Abrir</span>
+              </button>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-lg font-extrabold">Comparte con la red</div>
+                    <div className="mt-1 text-xs text-white/60">
+                      Señales: especialidad, intereses, Interesante, actividad de mates.
+                    </div>
+                  </div>
 
-            <a
-              href="/reels"
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10"
-            >
-              <ExternalLink size={16} /> Reels
-            </a>
-          </div>
-
-          {doiInput.trim() && !doiPreview && (
-            <div className="mt-3 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-4 py-3 text-white/70">
-              DOI no encontrado en la BD mock. (En producción: Crossref/PubMed/Unpaywall)
-            </div>
-          )}
-
-          {doiPreview && (
-            <GlassCard className="mt-4 p-4 shadow-none">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-sm font-extrabold">{doiPreview.title}</div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
-                      {doiPreview.venue}
-                    </span>
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
-                      {doiPreview.year}
-                    </span>
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
-                      {doiPreview.doi}
-                    </span>
+                  <div className="flex gap-2">
+                    <button
+                      className={clsx(
+                        "inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5",
+                        mode === "forYou" ? "bg-white/10" : "bg-white/5 hover:bg-white/10"
+                      )}
+                      onClick={() => setMode("forYou")}
+                    >
+                      <Users size={16} /> Para ti
+                    </button>
+                    <button
+                      className={clsx(
+                        "inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5",
+                        mode === "trending" ? "bg-white/10" : "bg-white/5 hover:bg-white/10"
+                      )}
+                      onClick={() => setMode("trending")}
+                    >
+                      <TrendingUp size={16} /> Tendencias
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => copyDoi(doiPreview.doi)}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs hover:bg-white/10"
-                  >
-                    <Copy size={14} /> {copied === doiPreview.doi ? "Copiado" : "Copiar DOI"}
-                  </button>
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-white/70">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Caso</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Hallazgo</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Teaching pearl</span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Revisión rápida</span>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <div className="flex min-w-[260px] flex-1 items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                    <Link2 size={16} className="opacity-80" />
+                    <input
+                      value={doiInput}
+                      onChange={(e) => setDoiInput(e.target.value)}
+                      placeholder="Pega un DOI (p.ej., 10.1234/medverse.2025.001)"
+                      className="w-full bg-transparent outline-none placeholder:text-white/40"
+                    />
+                  </div>
 
                   <button
-                    onClick={() => generateAi(doiPreview)}
                     className={clsx(
-                      "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs",
-                      aiBusy === doiPreview.doi
-                        ? "border-white/10 bg-white/5 opacity-60 cursor-wait"
-                        : "border-violet-300/25 bg-violet-300/10 hover:brightness-105"
+                      "inline-flex items-center gap-2 rounded-2xl border border-white/10 px-4 py-3",
+                      videoNote ? "bg-blue-500/20 border-blue-400/30" : "bg-white/5 hover:bg-white/10"
                     )}
-                    disabled={aiBusy === doiPreview.doi}
-                    title="Botón mock: en app real, esto llamaría a un servicio de IA"
+                    onClick={() => setVideoNote((v) => !v)}
                   >
-                    <Wand2 size={14} /> {aiByDoi[doiPreview.doi] ? "Regenerar IA" : "Generar con IA"}
+                    <Video size={16} /> Nota en video
                   </button>
-                </div>
-              </div>
 
-              <div className="mt-4 grid grid-cols-[1.3fr_.9fr] gap-4 max-[900px]:grid-cols-1">
-                <div>
-                  <div className="text-sm font-bold text-white/90">Abstract (vista previa)</div>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">{doiPreview.abstract}</p>
+                  <a
+                    href="/reels"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10"
+                  >
+                    <ExternalLink size={16} /> Reels
+                  </a>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-[radial-gradient(600px_260px_at_70%_0%,rgba(140,107,255,.18),transparent_60%)] from-white/5 to-white/[0.02] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-bold text-white/90">Infografía del abstract</div>
-                    {aiByDoi[doiPreview.doi] && (
-                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/70">
-                        IA · {aiByDoi[doiPreview.doi].generatedAt}
-                      </span>
-                    )}
+                {doiInput.trim() && !doiPreview && (
+                  <div className="mt-3 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-4 py-3 text-white/70">
+                    DOI no encontrado en la BD mock. (En producción: Crossref/PubMed/Unpaywall)
                   </div>
+                )}
 
-                  {aiByDoi[doiPreview.doi] ? (
-                    <AiInfographic pack={aiByDoi[doiPreview.doi]} />
-                  ) : (
-                    <>
-                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-white/70">
-                        {doiPreview.keyPoints.map((k) => (
-                          <li key={k}>{k}</li>
-                        ))}
-                      </ul>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {doiPreview.tags.map((t) => (
-                          <span
-                            key={t}
-                            className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/75"
-                          >
-                            {t}
+                {doiPreview && (
+                  <GlassCard className="mt-4 p-4 shadow-none">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-extrabold">{doiPreview.title}</div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+                            {doiPreview.venue}
                           </span>
-                        ))}
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+                            {doiPreview.year}
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+                            {doiPreview.doi}
+                          </span>
+                        </div>
                       </div>
-                    </>
-                  )}
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => copyDoi(doiPreview.doi)}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs hover:bg-white/10"
+                        >
+                          <Copy size={14} /> {copied === doiPreview.doi ? "Copiado" : "Copiar DOI"}
+                        </button>
+
+                        <button
+                          onClick={() => generateAi(doiPreview)}
+                          className={clsx(
+                            "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs",
+                            aiBusy === doiPreview.doi
+                              ? "border-white/10 bg-white/5 opacity-60 cursor-wait"
+                              : "border-violet-300/25 bg-violet-300/10 hover:brightness-105"
+                          )}
+                          disabled={aiBusy === doiPreview.doi}
+                          title="Botón mock: en app real, esto llamaría a un servicio de IA"
+                        >
+                          <Wand2 size={14} /> {aiByDoi[doiPreview.doi] ? "Regenerar IA" : "Generar con IA"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-[1.3fr_.9fr] gap-4 max-[900px]:grid-cols-1">
+                      <div>
+                        <div className="text-sm font-bold text-white/90">Abstract (vista previa)</div>
+                        <p className="mt-2 text-sm leading-relaxed text-white/70">{doiPreview.abstract}</p>
+                      </div>
+
+                      <div className="rounded-2xl border border-white/10 bg-[radial-gradient(600px_260px_at_70%_0%,rgba(140,107,255,.18),transparent_60%)] from-white/5 to-white/[0.02] p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-sm font-bold text-white/90">Infografía del abstract</div>
+                          {aiByDoi[doiPreview.doi] && (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/70">
+                              IA · {aiByDoi[doiPreview.doi].generatedAt}
+                            </span>
+                          )}
+                        </div>
+
+                        {aiBusy === doiPreview.doi ? (
+                          <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-3 text-xs text-white/70">
+                            <div className="flex items-center gap-2">
+                              <span className="h-2 w-2 animate-ping rounded-full bg-cyan-300" />
+                              <span>IA generando un resumen del DOI…</span>
+                            </div>
+                            <div className="mt-2 h-2 animate-pulse rounded bg-white/10" />
+                          </div>
+                        ) : aiByDoi[doiPreview.doi] ? (
+                          <AiInfographic pack={aiByDoi[doiPreview.doi]} />
+                        ) : (
+                          <>
+                            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-white/70">
+                              {doiPreview.keyPoints.map((k) => (
+                                <li key={k}>{k}</li>
+                              ))}
+                            </ul>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {doiPreview.tags.map((t) => (
+                                <span
+                                  key={t}
+                                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/75"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </GlassCard>
+                )}
+
+                <textarea
+                  className="mt-4 min-h-[110px] w-full resize-y rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none placeholder:text-white/40"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Escribe qué hace interesante el DOI para clínica o docencia…"
+                />
+
+                {videoNote && (
+                  <div className="mt-3 rounded-2xl border border-blue-400/30 bg-blue-500/10 px-4 py-3">
+                    <div className="inline-block rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs">
+                      Nota en video (mock)
+                    </div>
+                    <div className="mt-2 text-sm text-white/70">
+                      Agrega un clip de 30–90s explicando por qué importa clínicamente.
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="text-xs text-white/60">
+                    Tip: DOI + 1 limitación + 1 conclusión práctica. Se publica directo en tu feed.
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setComposerOpen(false)}
+                      className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+                    >
+                      Cerrar
+                    </button>
+                    <button
+                      onClick={publish}
+                      className="inline-flex items-center gap-2 rounded-full border border-blue-400/45 bg-gradient-to-b from-blue-500/95 to-blue-500/55 px-4 py-2.5 hover:brightness-105"
+                    >
+                      <Send size={16} /> Publicar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </GlassCard>
-          )}
+              </>
+            )}
+          </GlassCard>
 
-          <textarea
-            className="mt-4 min-h-[110px] w-full resize-y rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm outline-none placeholder:text-white/40"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Tu comentario… (relevancia clínica, métodos, limitaciones, aplicabilidad)"
-          />
-
-          {videoNote && (
-            <div className="mt-3 rounded-2xl border border-blue-400/30 bg-blue-500/10 px-4 py-3">
-              <div className="inline-block rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs">
-                Nota en video (mock)
-              </div>
-              <div className="mt-2 text-sm text-white/70">Agrega un clip de 30–90s explicando por qué importa clínicamente.</div>
-            </div>
-          )}
-
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="text-xs text-white/60">Tip: DOI + 1 limitación + 1 conclusión práctica.</div>
-            <button
-              onClick={publish}
-              className="inline-flex items-center gap-2 rounded-full border border-blue-400/45 bg-gradient-to-b from-blue-500/95 to-blue-500/55 px-4 py-2.5 hover:brightness-105"
-            >
-              <Send size={16} /> Publicar
-            </button>
+          {/* Timeline tipo red social */}
+          <div className="space-y-4">
+            {feed.map(({ post, reasons }) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                reasons={reasons}
+                ai={post.doi ? aiByDoi[post.doi.doi] : undefined}
+                aiBusy={aiBusy}
+                onGenerateAi={() => post.doi && generateAi(post.doi)}
+                onOpenAbstract={() => openAbstract(post.id)}
+                onCopyDoi={() => post.doi && copyDoi(post.doi.doi)}
+                copied={copied}
+                onSpark={() => toggleSpark(post.id)}
+                onOrbit={() => toggleOrbit(post.id)}
+                onRecast={() => doRecast(post.id)}
+                onComment={(c) => addComment(post.id, c)}
+                mateHandles={following}
+              />
+            ))}
           </div>
-        </GlassCard>
+        </div>
 
-        {/* Feed */}
-        <div className="flex flex-col gap-4">
-          {feed.map(({ post, reasons }) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              reasons={reasons}
-              ai={post.doi ? aiByDoi[post.doi.doi] : undefined}
-              aiBusy={aiBusy}
-              onGenerateAi={() => post.doi && generateAi(post.doi)}
-              onOpenAbstract={() => openAbstract(post.id)}
-              onCopyDoi={() => post.doi && copyDoi(post.doi.doi)}
-              copied={copied}
-              onSpark={() => toggleSpark(post.id)}
-              onOrbit={() => toggleOrbit(post.id)}
-              onRecast={() => doRecast(post.id)}
-              onComment={(c) => addComment(post.id, c)}
-              mateHandles={following}
-            />
-          ))}
+        {/* Panel lateral para hacerlo más “network” */}
+        <div className="space-y-4 max-[1080px]:hidden">
+          <GlassCard className="p-5 shadow-none">
+            <div className="flex items-center justify-between">
+              <div className="inline-flex items-center gap-2 text-sm font-extrabold">
+                <TrendingUp size={16} /> Tendencias rápidas
+              </div>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/60">
+                Top {Math.min(5, trending.length)}
+              </span>
+            </div>
+            <div className="mt-3 space-y-3">
+              {trending.length === 0 ? (
+                <div className="text-sm text-white/60">Sin tendencia aún. Interactúa con los mocks.</div>
+              ) : (
+                trending.slice(0, 5).map((p) => (
+                  <div key={p.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                    <div className="text-xs text-white/60">{p.doi?.doi ?? "Post"}</div>
+                    <div className="mt-1 truncate text-sm font-bold text-white/85">{p.doi?.title ?? p.text}</div>
+                    <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-white/60">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                        Intereses: {p.spark.count}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                        Recast: {p.recast.count}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                        Reads: {p.metrics.reads}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </GlassCard>
+
+          <GlassCard className="p-5 shadow-none">
+            <div className="inline-flex items-center gap-2 text-sm font-extrabold">
+              <Orbit size={16} /> Orbit / guardados
+            </div>
+            <div className="mt-3 space-y-2 text-sm text-white/70">
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                <span>Revisa lo que marcaste</span>
+                <Link
+                  to="/studyorbit"
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs hover:bg-white/10"
+                >
+                  Abrir
+                </Link>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-xs text-white/60">
+                Interesante = interés clínico/docente, Orbit = guardado para leer.
+              </div>
+            </div>
+          </GlassCard>
         </div>
       </div>
     </div>
@@ -633,7 +854,7 @@ export default function MedCore() {
 }
 
 function scoreTrending(p: Post) {
-  // lecturas + recast + sparks
+  // lecturas + recast + intereses
   return p.metrics.reads * 2 + p.recast.count * 6 + p.spark.count * 1.5 + p.rounds.count * 1;
 }
 
@@ -641,7 +862,7 @@ function trendingReasons(p: Post): string[] {
   const reasons: string[] = [];
   if (p.metrics.reads >= 80) reasons.push("Muchas lecturas");
   if (p.recast.count >= 15) reasons.push("Muy recasteado");
-  if (p.spark.count >= 120) reasons.push("Muchos sparks");
+  if (p.spark.count >= 120) reasons.push("Muchos intereses");
   if (reasons.length === 0) reasons.push("Señal de tendencia");
   return reasons.slice(0, 2);
 }
@@ -686,7 +907,7 @@ function scoreForYou(p: Post, user: UserProfile | null, followingSet: Set<string
 
   const reasons: string[] = [];
   if (isMate) reasons.push("De tus mates");
-  if (mateSpark) reasons.push("Tus mates le dieron spark");
+  if (mateSpark) reasons.push("Tus mates marcaron Interesante");
   if (specHit) reasons.push("Coincide con tu especialidad");
   if (matchedInterestLabels.length) {
     const nice = matchedInterestLabels.slice(0, 2).map(titleize).join(", ");
@@ -765,7 +986,7 @@ function PostCard({
 
               {sparkedByMate && (
                 <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[11px] text-white/80">
-                  <Flame size={14} /> Spark de @{sparkedByMate}
+                  <Flame size={14} /> Interesante de @{sparkedByMate}
                 </span>
               )}
             </div>
@@ -833,7 +1054,15 @@ function PostCard({
 
           <p className="mt-3 text-sm leading-relaxed text-white/70">{post.doi.abstract}</p>
 
-          {ai ? (
+          {aiBusy === post.doi.doi ? (
+            <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-xs text-white/70">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 animate-ping rounded-full bg-cyan-300" />
+                <span>IA generando un resumen de esta publicación…</span>
+              </div>
+              <div className="mt-2 h-2 animate-pulse rounded bg-white/10" />
+            </div>
+          ) : ai ? (
             <div className="mt-3">
               <AiInfographic pack={ai} compact />
             </div>
@@ -860,7 +1089,7 @@ function PostCard({
             post.spark.active ? "bg-white/10" : "bg-white/5 hover:bg-white/10"
           )}
         >
-          <Sparkles size={16} /> Spark <span className="text-white/60">{post.spark.count}</span>
+          <Sparkles size={16} /> Interesante <span className="text-white/60">{post.spark.count}</span>
         </button>
 
         <button

@@ -32,13 +32,16 @@ type UserProfile = {
 
 type PostLite = {
   id: string;
-  author: { handle: string; name: string };
+  author?: { handle?: string; name?: string; headline?: string };
+  createdAt?: string;
+  text?: string;
   metrics?: { reads: number };
   spark?: { count: number };
   recast?: { count: number };
   rounds?: { count: number };
   orbit?: { active: boolean };
-  doi?: { doi: string; title: string };
+  doi?: { doi?: string; title?: string };
+  hasVideoNote?: boolean;
 };
 
 function scoreTrending(p: PostLite) {
@@ -82,6 +85,10 @@ export default function Home() {
 
   const trending = useMemo(() => {
     return [...posts].sort((a, b) => scoreTrending(b) - scoreTrending(a)).slice(0, 5);
+  }, [posts]);
+
+  const feedPreview = useMemo(() => {
+    return posts.slice(0, 4);
   }, [posts]);
 
   return (
@@ -129,7 +136,7 @@ export default function Home() {
                 Bienvenido/a de vuelta, {user?.name ?? session?.handle}
               </h1>
               <p className="mx-auto mt-3 max-w-[780px] text-[15.5px] leading-[1.75] text-white/70">
-                Tu Feed personalizado usa: especialidad, intereses, tus Sparks y actividad de mates (mock).
+                Tu Feed personalizado usa: especialidad, intereses, tus Intereses marcados y actividad de mates (mock).
               </p>
 
               <div className="mt-5 flex flex-wrap justify-center gap-3">
@@ -202,10 +209,89 @@ export default function Home() {
                   <span className="text-2xl font-extrabold">{Math.min(10, posts.length)}</span>
                 </div>
                 <div className="mt-2 text-xs text-white/60">
-                  Basado en reads + Sparks + Recast (mock).
+                  Basado en reads + Intereses + Recast (mock).
                 </div>
               </GlassCard>
             </div>
+
+            {/* Feed preview */}
+            <GlassCard className="mt-4 p-5 shadow-none">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2 text-lg font-extrabold">
+                  <Sparkles size={18} /> Feed inicial
+                </div>
+                <Link
+                  to="/medcore"
+                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Abrir MedCore
+                </Link>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {feedPreview.length === 0 ? (
+                  <div className="text-sm text-white/60">Aún no hay publicaciones. Crea tu primer post en MedCore.</div>
+                ) : (
+                  feedPreview.map((p) => (
+                    <div key={p.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate font-bold">
+                            {p.author?.name ?? "Autor"}{" "}
+                            <span className="font-normal text-white/55">@{p.author?.handle ?? "handle"}</span>
+                          </div>
+                          <div className="mt-1 text-xs text-white/60">
+                            {p.author?.headline ?? "Publicacion reciente"} {p.createdAt ? `- ${p.createdAt}` : ""}
+                          </div>
+                          {p.text && <div className="mt-2 text-sm text-white/75">{p.text}</div>}
+
+                          {p.doi && (
+                            <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3">
+                              <div className="text-xs text-white/60">{p.doi.doi}</div>
+                              <div className="mt-1 text-sm font-bold text-white/90">
+                                {p.doi.title ?? "Post de discusion"}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col items-end gap-1 text-xs text-white/60">
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                            Intereses: {p.spark?.count ?? 0}
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                            Comentarios: {p.rounds?.count ?? 0}
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                            Recast: {p.recast?.count ?? 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {p.hasVideoNote && (
+                          <span className="rounded-full border border-violet-300/20 bg-violet-300/10 px-3 py-1 text-[11px] text-white/80">
+                            Nota en video
+                          </span>
+                        )}
+                        {p.orbit?.active && (
+                          <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[11px] text-white/80">
+                            En Orbit
+                          </span>
+                        )}
+
+                        <Link
+                          to="/medcore"
+                          className="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs hover:bg-white/10"
+                        >
+                          Abrir en MedCore <ArrowRight size={14} />
+                        </Link>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </GlassCard>
 
             {/* Trending list */}
             <div className="mt-4 grid grid-cols-[1.25fr_.75fr] gap-4 max-[980px]:grid-cols-1">
@@ -240,7 +326,7 @@ export default function Home() {
                             Reads: {p.metrics?.reads ?? 0}
                           </span>
                           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                            Sparks: {p.spark?.count ?? 0}
+                            Intereses: {p.spark?.count ?? 0}
                           </span>
                           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
                             Recast: {p.recast?.count ?? 0}
