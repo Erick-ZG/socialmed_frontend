@@ -30,7 +30,7 @@ type UserProfile = {
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const [user] = useLocalStorageState<UserProfile | null>("mv_user", null);
   const loc = useLocation();
-  if (!user) return <Navigate to="/onboarding" replace state={{ from: loc.pathname }} />;
+  if (!user) return <Navigate to="/" replace state={{ from: loc.pathname }} />;
   return <>{children}</>;
 }
 

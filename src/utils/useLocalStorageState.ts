@@ -1,20 +1,66 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-function safeParse<T>(raw: string | null, fallback: T): T {
-  if (!raw) return fallback;
+const LOCAL_EVENT = "mv:local-storage";
+
+function readJSON<T>(key: string, fallback: T): T {
   try {
-    return JSON.parse(raw) as T;
+    const raw = localStorage.getItem(key);
+    return raw == null ? fallback : (JSON.parse(raw) as T);
   } catch {
     return fallback;
   }
 }
 
-export default function useLocalStorageState<T>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(() => safeParse(localStorage.getItem(key), initial));
+export default function useLocalStorageState<T>(key: string, initialValue: T) {
+  const initialRef = useRef(initialValue);
+  initialRef.current = initialValue;
+
+  const [value, setValue] = useState<T>(() => readJSON<T>(key, initialValue));
 
   useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value));
-  }, [key, value]);
+    const sync = (evt: Event) => {
+      // 1) StorageEvent (solo otras tabs)
+      if (evt instanceof StorageEvent) {
+        if (evt.key !== key) return;
+        setValue(readJSON<T>(key, initialRef.current));
+        return;
+      }
 
-  return [value, setValue] as const;
+      // 2) CustomEvent (misma tab)
+      const ce = evt as CustomEvent<{ key?: string }>;
+      if (ce.detail?.key !== key) return;
+      setValue(readJSON<T>(key, initialRef.current));
+    };
+
+    window.addEventListener("storage", sync);
+    window.addEventListener(LOCAL_EVENT, sync as EventListener);
+
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(LOCAL_EVENT, sync as EventListener);
+    };
+  }, [key]);
+
+  const setAndStore = useCallback(
+    (next: T | ((prev: T) => T)) => {
+      setValue((prev) => {
+        const resolved = typeof next === "function" ? (next as (p: T) => T)(prev) : next;
+
+        try {
+          if (resolved === (null as unknown as T)) localStorage.removeItem(key);
+          else localStorage.setItem(key, JSON.stringify(resolved));
+        } catch {
+          // ignore
+        }
+
+        // 🔥 avisar al resto de componentes en ESTA pestaña
+        window.dispatchEvent(new CustomEvent(LOCAL_EVENT, { detail: { key } }));
+
+        return resolved;
+      });
+    },
+    [key]
+  );
+
+  return [value, setAndStore] as const;
 }

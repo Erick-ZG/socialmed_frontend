@@ -1,5 +1,9 @@
 import type { ReactNode, CSSProperties } from "react";
+import { useLocation } from "react-router-dom";
 import NavBar from "./NavBar";
+import useLocalStorageState from "../utils/useLocalStorageState";
+
+type Session = { handle: string; loggedInAt: string };
 
 const spaceBg: CSSProperties = {
   backgroundImage: `
@@ -22,6 +26,14 @@ const starfield: CSSProperties = {
 };
 
 export default function AppShell({ children }: { children: ReactNode }) {
+  const loc = useLocation();
+  const [session] = useLocalStorageState<Session | null>("mv_session", null);
+
+  const isAuthScreen = loc.pathname === "/" && !session;
+
+  // ✅ Home tipo Instagram: pantalla completa, blanca, sin navbar/footers del shell
+  if (isAuthScreen) return <>{children}</>;
+
   return (
     <div className="min-h-screen text-white" style={spaceBg}>
       <div className="pointer-events-none fixed inset-0 opacity-90" style={starfield} />

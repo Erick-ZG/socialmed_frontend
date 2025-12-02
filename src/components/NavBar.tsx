@@ -1,19 +1,11 @@
 import { useMemo, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  LogOut,
-  User as UserIcon,
-  Settings,
-} from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, User as UserIcon, Settings } from "lucide-react";
 
 import Avatar from "./Avatar";
 import useLocalStorageState from "../utils/useLocalStorageState";
 
 type NavItem = { to?: string; label: string; disabled?: boolean };
-
 type Session = { handle: string; loggedInAt: string };
 
 type UserProfile = {
@@ -24,19 +16,15 @@ type UserProfile = {
   locationLine: string;
   specialty: string;
   interests: string[];
-  avatarUrl?: string; // si lo pones, ideal que sea de /public (ej: "/esp.jpeg")
+  avatarUrl?: string;
 };
 
 const items: NavItem[] = [
   { to: "/medcore", label: "MEDCORE" },
-  { to: "/medcolab", label: "MEDCOLAB" }, // aunque sea mock
-  { to: "/medmates", label: "MEDMATES" }, // aunque sea mock
+  { to: "/medcolab", label: "MEDCOLAB" },
+  { to: "/medmates", label: "MEDMATES" },
   { to: "/medtools", label: "MEDTOOLS" },
 ];
-
-function nowISO() {
-  return new Date().toISOString();
-}
 
 function initials(name?: string) {
   if (!name) return "MV";
@@ -54,52 +42,44 @@ export default function NavBar() {
   const [user, setUser] = useLocalStorageState<UserProfile | null>("mv_user", null);
 
   const isLogged = !!session;
-  const isProfile = useMemo(() => loc.pathname.startsWith("/profile"), [loc.pathname]);
 
   const profilePath = useMemo(() => {
     const handle = user?.handle || session?.handle || "you";
     return `/profile/${handle}`;
   }, [user?.handle, session?.handle]);
 
-  function loginDemo() {
-    // Si no hay user, creamos uno demo para que “parezca real”
-    const demo: UserProfile = user ?? {
-      handle: "daniel.mego",
-      name: "Daniel Mego",
-      roleLine: "Med Student • Young Researcher",
-      school: "Universidad (mock)",
-      locationLine: "LatAm",
-      specialty: "Medicina Interna",
-      interests: ["Evidencia clínica", "Educación médica", "Investigación joven"],
-      // avatarUrl: "/esp.jpeg", // <- solo si lo pones en /public
-    };
-
-    if (!user) setUser(demo);
-    setSession({ handle: demo.handle, loggedInAt: nowISO() });
+  function goLogin() {
     setUserMenu(false);
     setOpen(false);
-    nav("/");
+    nav("/", { replace: true });
   }
 
-  function logout() {
-    setSession(null);
-    setUserMenu(false);
-    setOpen(false);
-    nav("/");
-  }
+function logout() {
+  // hard clear (por si algún guard lee directo localStorage)
+  localStorage.removeItem("mv_session");
+  localStorage.removeItem("mv_user");
+
+  setSession(null);
+  setUser(null);
+
+  setUserMenu(false);
+  setOpen(false);
+
+  nav("/", { replace: true });
+}
 
   return (
     <header className="relative mx-auto w-[min(1140px,92vw)] pt-5">
       <nav className="flex items-center justify-between">
         {/* Logo */}
-        <NavLink to="/" className="flex items-center gap-3">
+        <NavLink to={isLogged ? "/medcore" : "/"} className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/5">
             <span className="text-sm font-black">✦</span>
           </div>
           <span className="text-lg font-extrabold tracking-[0.12em]">MEDVERSE</span>
         </NavLink>
 
-        {/* Desktop links centered */}
+        {/* Desktop links */}
         <div className="hidden md:flex items-center gap-10 text-sm font-semibold tracking-[0.18em] text-white/80">
           {items.map((it) =>
             it.disabled || !it.to ? (
@@ -111,10 +91,7 @@ export default function NavBar() {
                 key={it.to}
                 to={it.to}
                 className={({ isActive }) =>
-                  [
-                    "transition-colors hover:text-white",
-                    isActive ? "text-white" : "text-white/75",
-                  ].join(" ")
+                  ["transition-colors hover:text-white", isActive ? "text-white" : "text-white/75"].join(" ")
                 }
               >
                 {it.label}
@@ -127,24 +104,14 @@ export default function NavBar() {
         <div className="flex items-center gap-3">
           {!isLogged ? (
             <button
-              onClick={loginDemo}
-              className={[
-                "hidden sm:inline-flex items-center rounded-full border px-4 py-2 text-sm transition-colors",
-                isProfile ? "border-white/15 bg-white/5 hover:bg-white/10" : "border-white/10 bg-white/5 hover:bg-white/10",
-              ].join(" ")}
+              onClick={goLogin}
+              className="hidden sm:inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
             >
               Log in
             </button>
           ) : (
             <div className="relative hidden sm:block">
-              {/* click-outside layer */}
-              {userMenu && (
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setUserMenu(false)}
-                  aria-hidden="true"
-                />
-              )}
+              {userMenu && <div className="fixed inset-0 z-10" onClick={() => setUserMenu(false)} aria-hidden="true" />}
 
               <button
                 onClick={() => setUserMenu((v) => !v)}
@@ -152,7 +119,12 @@ export default function NavBar() {
                 aria-haspopup="menu"
                 aria-expanded={userMenu}
               >
-                <Avatar initials={initials(user?.name)} src={user?.avatarUrl} alt={user?.name || "User"} size={30} />
+                <Avatar
+                  initials={initials(user?.name ?? session.handle)}
+                  src={user?.avatarUrl}
+                  alt={user?.name || "User"}
+                  size={30}
+                />
                 <span className="max-w-[140px] truncate text-sm text-white/85">{user?.name ?? session.handle}</span>
                 <ChevronDown size={16} className="opacity-80" />
               </button>
@@ -180,9 +152,10 @@ export default function NavBar() {
                     >
                       <Settings size={16} /> Edit onboarding
                     </NavLink>
-
                     <button
-                      onClick={logout}
+                      type="button"
+                      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); logout(); }}
                       className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/80 hover:bg-white/10"
                     >
                       <LogOut size={16} /> Log out
@@ -218,10 +191,9 @@ export default function NavBar() {
                   to={it.to}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
-                    [
-                      "rounded-xl px-3 py-2",
-                      isActive ? "bg-white/10 text-white" : "text-white/80 hover:bg-white/10",
-                    ].join(" ")
+                    ["rounded-xl px-3 py-2", isActive ? "bg-white/10 text-white" : "text-white/80 hover:bg-white/10"].join(
+                      " "
+                    )
                   }
                 >
                   {it.label}
@@ -231,10 +203,7 @@ export default function NavBar() {
 
             <div className="mt-2 border-t border-white/10 pt-2">
               {!isLogged ? (
-                <button
-                  onClick={loginDemo}
-                  className="w-full rounded-xl px-3 py-2 text-left text-white/85 hover:bg-white/10"
-                >
+                <button onClick={goLogin} className="w-full rounded-xl px-3 py-2 text-left text-white/85 hover:bg-white/10">
                   Log in
                 </button>
               ) : (
@@ -254,7 +223,9 @@ export default function NavBar() {
                     Edit onboarding
                   </NavLink>
                   <button
-                    onClick={logout}
+                    type="button"
+                    onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); logout(); }}
                     className="w-full rounded-xl px-3 py-2 text-left text-white/85 hover:bg-white/10"
                   >
                     Log out
